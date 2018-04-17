@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC   
+    "-//mybatis.org//DTD Mapper 3.0//EN"  
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="dao.ProductDao">
+
+	<select id="searchAll" resultMap="Product" >
+		select p.*,pic.id as picId,pic.name as picName from product as p inner join picture as pic on p.id=pic.p_id
+	</select>
+	<select id="search" resultMap="Product" >
+		select p.*,pic.id as picId,pic.name as picName from product as p inner join picture as pic on p.id=pic.p_id 
+		where p.name like '%${text}%' or content like '%${text}%'
+	</select>
+	<select id="searchById" resultMap="Product" >
+		select p.*,pic.id as picId,pic.name as picName,pub.name as pubName,sc.name as scName,bc.name as bcName 
+		from product as p inner join picture as pic on p.id=pic.p_id 
+		inner join publish as pub on p.pub_id=pub.id 
+		inner join smallclass as sc on sc.id=p.sc_id 
+		inner join bigclass as bc on bc.id=sc.big_id 
+		where p.id=#{id}
+	</select>
+	<resultMap type="entity.Product" id="Product">
+		<id property="id" column="id"></id>
+		<result property="name" column="name"></result>
+		<result property="content" column="content"></result>
+		<result property="price" column="price"></result>
+		<result property="author" column="author"></result>
+		<association property="publish" javaType="entity.Publish">
+			<id property="id" column="pubId"/>
+			<result property="name" column="pubName"/>
+		</association>
+		<association property="smallClass" javaType="entity.SmallClass">
+			<id property="id" column="scId"/>
+			<result property="name" column="scName"/>
+			<association property="bigClass" javaType="entity.BigClass">
+				<id property="id" column="bcId"/>
+				<result property="name" column="bcName"/>
+			</association>
+		</association>
+		<collection property="pics" ofType="entity.Picture">
+			<id property="id" column="picId"></id>
+		<result property="name" column="picName"></result>
+		</collection>
+	</resultMap>
+</mapper> 
+    

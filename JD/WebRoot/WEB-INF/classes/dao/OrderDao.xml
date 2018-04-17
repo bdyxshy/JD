@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC   
+    "-//mybatis.org//DTD Mapper 3.0//EN"  
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="dao.OrderDao">
+
+	<insert id="addOrder" useGeneratedKeys="true" keyProperty="id">
+		insert into orders(number,p_id,num,total,u_id) values(#{number},#{product.id},#{num},#{total},#{user.id})
+	</insert>
+	<insert id="addOrderMap">
+		insert into m_order_product(o_id,p_id,num) values(#{oId},#{pId},#{num})
+	</insert>
+	<select id="showOrder" resultMap="OrderAll">
+		select o.id,o.number,o.num,o.total,p.id as pId,p.price,p.name as pName,
+		pic.id as picId,pic.name as picName 
+		from orders as o 
+		inner join product as p on o.p_id=p.id 
+		inner join picture as pic on p.id=pic.p_id 
+		where number=#{number} 
+	</select>
+	<select id="searchNumber" resultMap="Order">
+		select number from orders where u_id=#{uId} group by number desc having count(number)>=1 
+	</select>
+		
+	
+	<update id="delOrder">
+		delete from orders where id=#{orderId} and u_id=#{uId}
+	</update>
+	<resultMap type="entity.Order" id="Order">
+		<id property="id" column="id"/>
+		<result property="number" column="number"/>
+		<result property="total" column="total"/>
+		<result property="num" column="num"/>
+		<result property="pId" column="p_id"/>
+		<result property="uId" column="u_id"/>
+	</resultMap>
+	<resultMap type="entity.Order" id="OrderAll">
+		<id property="id" column="id"/>
+		<result property="number" column="number"/>
+		<result property="total" column="total"/>
+		<result property="num" column="num"/>
+		<result property="uId" column="u_id"/>
+		<association property="product" javaType="entity.Product">
+			<id property="id" column="pId"></id>
+			<result property="name" column="pName"></result>
+			<result property="price" column="price"></result>
+			<collection property="pics" ofType="entity.Picture">
+				<id property="id" column="picId"></id>
+				<result property="name" column="picName"></result>
+			</collection>
+		</association>
+	</resultMap>
+</mapper> 
+    
