@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC   
+    "-//mybatis.org//DTD Mapper 3.0//EN"  
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="dao.CartDao">
+
+	<select id="searchByProductAndUser" resultMap="Cart" >
+		select * from cart where p_id=#{cart.product.id} and u_id=#{cart.user.id}
+	</select>
+	<select id="searchByUser" resultMap="CartAll" >
+		select c.id,c.num,c.total,p.id as pId,p.price,p.name as pName,
+		pic.id as picId,pic.name as picName 
+		from cart as c 
+		inner join product as p on c.p_id=p.id 
+		inner join picture as pic on p.id=pic.p_id 
+		where u_id=#{user.id}
+	</select>
+	<select id="searchById" resultMap="CartAll">
+		select c.id,c.num,c.total,p.price,p.id as pId  
+		from cart as c 
+		inner join product as p on c.p_id=p.id 
+		where c.id=#{id}
+	</select>
+	<insert id="add">
+		insert into cart (p_id,num,total,u_id) values(#{cart.product.id},#{cart.num},#{cart.total},#{cart.user.id})
+	</insert>
+	<update id="update">
+		update cart set num=#{cart.num},total=#{cart.total} where id=#{cart.id}
+	</update>
+	<update id="delete">
+		delete from cart where id=#{id}
+	</update>
+	<resultMap type="entity.Cart" id="Cart">
+		<id property="id" column="id"></id>
+		<result property="num" column="num"></result>
+	</resultMap>
+	<resultMap type="entity.Cart" id="CartAll">
+		<id property="id" column="id"></id>
+		<result property="num" column="num"></result>
+		<result property="total" column="total"></result>
+		<association property="product" javaType="entity.Product">
+			<id property="id" column="pId"></id>
+			<result property="name" column="pName"></result>
+			<result property="price" column="price"></result>
+			<collection property="pics" ofType="entity.Picture">
+				<id property="id" column="picId"></id>
+				<result property="name" column="picName"></result>
+			</collection>
+		</association>
+	</resultMap>
+</mapper> 
+    
